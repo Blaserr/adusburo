@@ -3,6 +3,31 @@ let currentQuestionIndex = 0;
 let score = 0;
 let answers = [];
 
+// Küçük, sevgiliye yazılmış rastgele motivasyon notları
+const motivasyonNotlari = [
+    "Sana her zaman güveniyorum güzelimm",
+    "Başarabileceğini biliyorum sadece sınavına odaklan.",
+    "Gülüşün her şeyden değerli",
+    "Sana inanıyorum tanıdığım en zeki kızsın yavrumm.",
+    "Her zaman yanındayımm.",
+    "Sen benim her şeyimsin meleğimm.",
+    "Bu notların hepsi senin başarına motivasyon olsun.",
+    "Soyadı gibi çalışkan kızım benimm",
+    "Birlikte aşarız bitanemm korkma.",
+    "Sonraki soruda seni bekliyorum hadi.",
+    "Çöz artık bücür",
+    "Sen yanlış yapmazsın merak etme soru hatalıdır.",
+    "Diyafram nefesi alıp tekrar deniyoruz hadi.",
+    "hmm??",
+    "Her soruya not mu bekliyon hayırdır yani",
+    "Sen benim en büyük şansımsın",
+    "Okumayı bırak soruları çöz artık",
+    "Sonraki notu merak ediyosan çözmek zorundasin",
+    "Sınavın çok güzel geçecek merak etme ben sana inanıyorum",
+    "Bu gidisle bitmicek haberin olsun askm",
+    "Aferin lan sana essek.",
+];
+
 function getKategoriler() {
     const kategoriler = new Set();
     soruBankasi.forEach(soru => {
@@ -52,30 +77,58 @@ function showQuestion() {
     document.getElementById('progress-fill').style.width = `${(currentQuestionIndex / currentQuestions.length) * 100}%`;
     document.getElementById('answer-input').value = '';
     document.getElementById('category-title').textContent = soru.kategori;
+
+    // Rastgele bir motivasyon notu seç ve sağ alt köşeye yerleştir
+    const note = motivasyonNotlari[Math.floor(Math.random() * motivasyonNotlari.length)];
+    let noteDiv = document.getElementById('motivasyon-note');
+    if (!noteDiv) {
+        noteDiv = document.createElement('div');
+        noteDiv.id = 'motivasyon-note';
+        document.body.appendChild(noteDiv);
+    }
+    noteDiv.textContent = note;
 }
 
 function evaluateAnswer(userAnswer, correctAnswer) {
-    const userAnswerClean = userAnswer.toLowerCase().trim().replace(/\s+/g, ' ');
-    const correctAnswerClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, ' ');
-    
-    // Tam eşleşme kontrolü
-    const isExactMatch = userAnswerClean === correctAnswerClean;
-    
-    // Noktalama işaretlerini kaldırarak kontrol
-    const userAnswerNoPunct = userAnswerClean.replace(/[.,!?;:]/g, '');
-    const correctAnswerNoPunct = correctAnswerClean.replace(/[.,!?;:]/g, '');
-    const isPunctuationDifferent = userAnswerNoPunct === correctAnswerNoPunct;
-    
-    // Doğru cevabı kelimelere ayırıp kontrol
-    const correctWords = new Set(correctAnswerNoPunct.split(' '));
-    const userWords = new Set(userAnswerNoPunct.split(' '));
-    const missingWords = [...correctWords].filter(word => !userWords.has(word));
-    const extraWords = [...userWords].filter(word => !correctWords.has(word));
-    
+    // Normalizasyon: küçük harf, noktalama kaldırma, fazla boşluk temizleme
+    const normalize = s => s.toLowerCase().replace(/[.,!?;:\-()\[\]"']/g, '').trim().replace(/\s+/g, ' ');
+    const userClean = normalize(userAnswer || '');
+    const correctClean = normalize(correctAnswer || '');
+
+    // Doğrudan tam eşleşme ödüllendirilir
+    if (userClean === correctClean && userClean.length > 0) {
+        return { dogru: true, eksikKelimeler: [], fazlaKelimeler: [], bulunanKelimeler: correctClean.split(' '), bulunmayanKelimeler: [], dogruCevap: correctAnswer };
+    }
+
+    // Stop-words (Türkçe yaygın bağlaç/edat vb.) çıkar
+    const stopWords = new Set(['ve','ile','in','da','de','bir','için','olarak','gibi','veya','bu','o','ile','ki','hem','ise','çok','az','en']);
+
+    const toWordSet = s => new Set((s.length === 0 ? [] : s.split(' ')).filter(w => w.length > 1 && !stopWords.has(w)));
+
+    const correctWords = toWordSet(correctClean);
+    const userWords = toWordSet(userClean);
+
+    // Kesişim ve farklar
+    const bulunan = [...correctWords].filter(w => userWords.has(w));
+    const bulunmayan = [...correctWords].filter(w => !userWords.has(w));
+    const fazla = [...userWords].filter(w => !correctWords.has(w));
+
+    // Doğru sayısını eşik ile değerlendir (ör. %60 veya en az 1 kelime)
+    const required = Math.max(1, Math.ceil(correctWords.size * 0.6));
+    const dogru = bulunan.length >= required;
+
+    // Gösterimi azaltmak için liste uzunluklarını sınırlayalım
+    const LIMIT = 3;
+    const limit = arr => arr.slice(0, LIMIT);
+
     return {
-        dogru: isExactMatch || isPunctuationDifferent,
-        eksikKelimeler: missingWords,
-        fazlaKelimeler: extraWords,
+        dogru,
+        eksikKelimeler: limit(bulunmayan),
+        fazlaKelimeler: limit(fazla),
+        bulunanKelimeler: limit(bulunan),
+        bulunmayanKelimeler: limit(bulunmayan),
+        toplamEksik: bulunmayan.length,
+        toplamFazla: fazla.length,
         dogruCevap: correctAnswer
     };
 }
@@ -95,6 +148,10 @@ function submitAnswer() {
         kullaniciCevabi: cevap,
         dogru: sonuc.dogru,
         dogruCevap: sonuc.dogruCevap,
+        bulunanKelimeler: sonuc.bulunanKelimeler || [],
+        bulunmayanKelimeler: sonuc.bulunmayanKelimeler || [],
+        toplamEksik: sonuc.toplamEksik || 0,
+        toplamFazla: sonuc.toplamFazla || 0,
         eksikKelimeler: sonuc.eksikKelimeler,
         fazlaKelimeler: sonuc.fazlaKelimeler
     };
@@ -122,26 +179,24 @@ function showFeedback(sonuc, cevap, soru) {
                 </div>
                 ${!sonuc.dogru ? `
                     <div class="feedback-details">
-                        ${sonuc.eksikKelimeler.length > 0 ? `
-                            <div class="missing-words">
-                                <strong>Eksik Kelimeler:</strong>
-                                <div class="keyword-list">
-                                    ${sonuc.eksikKelimeler.map(k => 
-                                        `<span class="keyword keyword-missing">${k}</span>`
-                                    ).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                        ${sonuc.fazlaKelimeler.length > 0 ? `
-                            <div class="extra-words">
-                                <strong>Fazla Kelimeler:</strong>
-                                <div class="keyword-list">
-                                    ${sonuc.fazlaKelimeler.map(k => 
-                                        `<span class="keyword keyword-extra">${k}</span>`
-                                    ).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
+                                ${sonuc.toplamEksik > 0 ? `
+                                    <div class="missing-words">
+                                        <strong>Eksik Kelimeler (${sonuc.toplamEksik}):</strong>
+                                        <div class="keyword-list">
+                                            ${sonuc.eksikKelimeler.map(k => `<span class="keyword keyword-missing">${k}</span>`).join('')}
+                                            ${sonuc.toplamEksik > sonuc.eksikKelimeler.length ? `<span class="more"> ... ve ${sonuc.toplamEksik - sonuc.eksikKelimeler.length} tane daha</span>` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${sonuc.toplamFazla > 0 ? `
+                                    <div class="extra-words">
+                                        <strong>Fazla Kelimeler (${sonuc.toplamFazla}):</strong>
+                                        <div class="keyword-list">
+                                            ${sonuc.fazlaKelimeler.map(k => `<span class="keyword keyword-extra">${k}</span>`).join('')}
+                                            ${sonuc.toplamFazla > sonuc.fazlaKelimeler.length ? `<span class="more"> ... ve ${sonuc.toplamFazla - sonuc.fazlaKelimeler.length} tane daha</span>` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
                     </div>
                 ` : ''}
             </div>
@@ -154,13 +209,14 @@ function showFeedback(sonuc, cevap, soru) {
 
 function skipQuestion() {
     const soru = currentQuestions[currentQuestionIndex];
-    
+    // Boş cevap ile değerlendirme yaparak eksik kelimeleri hesapla
+    const sonuc = evaluateAnswer('', soru.dogruCevap);
     answers.push({
         soru: soru.soru,
         kullaniciCevabi: '(Atlandı)',
         dogru: false,
         bulunanKelimeler: [],
-        bulunmayanKelimeler: soru.anahtar_kelimeler
+        bulunmayanKelimeler: sonuc.bulunmayanKelimeler || []
     });
     
     nextQuestion();
@@ -190,12 +246,8 @@ function showResults() {
             <div class="review-question">Soru ${index + 1}: ${answer.soru}</div>
             <div class="review-answer">Cevabınız: ${answer.kullaniciCevabi}</div>
             <div class="keyword-list">
-                ${answer.bulunanKelimeler.map(k => 
-                    `<span class="keyword keyword-found">${k}</span>`
-                ).join('')}
-                ${answer.bulunmayanKelimeler.map(k => 
-                    `<span class="keyword keyword-missing">${k}</span>`
-                ).join('')}
+                ${ (answer.bulunanKelimeler || []).map(k => `<span class="keyword keyword-found">${k}</span>` ).join('') }
+                ${ (answer.bulunmayanKelimeler || []).map(k => `<span class="keyword keyword-missing">${k}</span>` ).join('') }
             </div>
         </div>
     `).join('');

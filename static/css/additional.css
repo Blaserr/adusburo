@@ -30,3 +30,25 @@
 #home-page {
     display: block;
 }
+
+/* Motivasyon notu stili (sağ alt köşe) */
+#motivasyon-note {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    max-width: 260px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #222;
+    padding: 10px 12px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    font-size: 0.85rem;
+    line-height: 1.2;
+    pointer-events: none; /* tıklamayı engelle */
+    z-index: 9999;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+@media (max-width: 480px) {
+    #motivasyon-note { right: 10px; bottom: 10px; max-width: 200px; font-size: 0.78rem; }
+}

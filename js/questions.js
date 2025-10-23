@@ -94,4 +94,10 @@ const soruBankasi = [
         "dogruCevap": "Ekonomik araçlar (ücret, prim), psiko-sosyal araçlar (takdir, terfi) ve örgütsel araçlar (eğitim, katılım) olmak üzere üç grupta toplanır.",
         "kategori": "Yönetimde Motivasyon"
     }
+    ,
+    {
+        "soru": "Karar verme sürecinin aşamaları nelerdir?",
+        "dogruCevap": "Karar verme sürecinin aşamaları: problemin tanımlanması, alternatiflerin belirlenmesi, alternatiflerin değerlendirilmesi, en iyi alternatifin seçilmesi ve uygulama ile izlemedir.",
+        "kategori": "Yönetim Süreçleri"
+    }
 ];

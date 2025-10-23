@@ -1,0 +1,32 @@
+.question-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #666;
+}
+
+.category-title {
+    color: #666;
+    text-align: center;
+    margin: 10px 0 20px 0;
+    font-size: 1.2em;
+}
+
+#question-page, #feedback-page, #results-page {
+    display: none;
+}
+
+.btn-action {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+#home-page {
+    display: block;
+}

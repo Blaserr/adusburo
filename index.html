@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diksiyon Bilgi Testi</title>
+        <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/additional.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Ana sayfa içeriği -->
+        <div id="home-page" class="container">
+            <h1>Diksiyon Bilgi Testi</h1>
+            <p class="subtitle">Konuşma ve diksiyon bilginizi test edin</p>
+            
+            <div class="info-box">
+                <p><strong>📚 Test Hakkında:</strong></p>
+                <p>• Sorular kategorilere göre gruplandırılmıştır</p>
+                <p>• Her sorudan sonra detaylı geri bildirim alacaksınız</p>
+                <p>• Bilmediğiniz soruları atlayabilirsiniz</p>
+                <p>• Cevaplarınız anahtar kelimelere göre değerlendirilir</p>
+            </div>
+            
+            <div class="kategori-sec">
+                <label for="kategori">Kategori Seçin:</label>
+                <select name="kategori" id="kategori" required>
+                    <option value="Tümü">Tüm Sorular</option>
+                </select>
+            </div>
+            
+            <button onclick="startQuiz()" class="btn btn-primary" style="width: 100%;">
+                Teste Başla
+            </button>
+        </div>
+
+        <!-- Soru sayfası -->
+        <div id="question-page" class="container">
+            <h1>Diksiyon Bilgi Testi</h1>
+            <div class="category-title" id="category-title">Kategori</div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="question-info">
+                <span id="question-progress">Soru 1 / 22</span>
+                <span class="score">Puan: <span id="current-score">0</span></span>
+            </div>
+            <div class="question-box" id="current-question">
+            </div>
+            <textarea id="answer-input" rows="6" placeholder="Cevabınızı buraya yazın..."></textarea>
+            <div class="button-group">
+                <button onclick="skipQuestion()" class="btn-secondary">Atla</button>
+                <button onclick="submitAnswer()" class="btn-primary">Cevapla</button>
+            </div>
+        </div>
+
+        <!-- Geri bildirim sayfası -->
+        <div id="feedback-page" class="container">
+            <div id="feedback-content"></div>
+            <button onclick="nextQuestion()" class="btn-primary btn-action">
+                Sonraki Soru
+            </button>
+        </div>
+
+        <!-- Sonuç sayfası -->
+        <div id="results-page" class="container">
+            <div class="result-summary">
+                <h2>Test Tamamlandı!</h2>
+                <div class="result-score">
+                    <span id="final-score">0</span>/<span id="total-questions">0</span>
+                </div>
+                <div class="result-percentage">
+                    Başarı: <span id="success-percentage">0</span>%
+                </div>
+            </div>
+
+            <div class="review-section">
+                <h3 class="review-title">Cevaplarınızın Detaylı İncelemesi</h3>
+                <div id="answers-review"></div>
+            </div>
+
+            <button onclick="restartQuiz()" class="btn-primary btn-action">
+                Yeni Test Başlat
+            </button>
+        </div>
+    </div>
+
+    <script src="js/questions.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

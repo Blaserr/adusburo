@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diksiyon Çalışma Kartları</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Diksiyon & İletişim</h1>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p class="progress-label">Bilinen Sorular: <span id="known-count">0</span> / <span id="total-questions">27</span></p>
+            </div>
+            <p id="progress-text">Soru 1 / 27</p>
+        </div>
+
+        <div class="card" id="card-container">
+            <div class="card-content">
+                <h2 id="question-text">Soru yükleniyor...</h2>
+                <div id="answer-section" class="hidden">
+                    <hr>
+                    <p id="answer-text">Cevap burada görünecek.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="show-answer-btn" class="btn primary">Cevabı Göster</button>
+            
+            <div id="vote-btns" class="hidden">
+                <p class="sub-text">Nasıl geçti?</p>
+                <div class="btn-group">
+                    <button id="wrong-btn" class="btn danger">Hatırlamadım ❌</button>
+                    <button id="correct-btn" class="btn success">Bildim ✅</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <h2>Test Bitti! 🎉</h2>
+            <div class="score-box">
+                <p>Doğru Sayısı: <span id="final-correct">0</span></p>
+                <p>Yanlış Sayısı: <span id="final-wrong">0</span></p>
+            </div>
+            <p id="final-message"></p>
+            <button onclick="location.reload()" class="btn primary">Başa Dön</button>
+        </div>
+    </div>
+
+    <div id="motivation-note" class="motivation-note"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
